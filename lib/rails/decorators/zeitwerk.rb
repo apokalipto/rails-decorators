@@ -1,7 +1,11 @@
+# This used to work with older versions of zeitwerk supporting the deprecated preload interface. 
+# This mechanism decorates the loader (old method named "do_preload"). The new method is named setup.
+# This woud have skipeed the block in the mutex for thread safety so we disabled it by commenting the prepend.
+# Instead we relied on the callback in the engine initializer to load all the .decorator files, wich seemed to work.
 module Zeitwerk
   class Loader
     module RailsDecorators
-      def do_preload
+      def setup
         super
         load_decorators
       end
@@ -32,6 +36,6 @@ module Zeitwerk
       end
     end
 
-    prepend RailsDecorators
+    #prepend RailsDecorators
   end
 end
