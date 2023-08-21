@@ -6,10 +6,21 @@ module Rails
       isolate_namespace Rails::Decorators
 
       config.after_initialize do |app|
-        unless Rails.configuration.autoloader == :zeitwerk
-          raise MissingZeitwerkError, <<-eos.strip_heredoc
-            rails-decorators requires using the Zeitwerk code loader. You can set this in config/application.rb by doing `config.autoloader = :zeitwerk`
-          eos
+        #loader = Zeitwerk::Registry.loaders.first
+        Zeitwerk::Registry.loaders.each do |loader|
+          loader.on_setup do
+            loader.send(:roots).each do |root|
+            
+              dir, namespace = root
+
+              decorators = Dir.glob("#{dir}/**/*.#{Rails::Decorators.extension}")
+              decorators.sort!
+            
+              decorators.each do |d| 
+                load(d)
+              end
+            end
+          end
         end
       end
     end
